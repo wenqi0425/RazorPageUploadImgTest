@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +14,9 @@ namespace RazorPageUploadImgTest.Controllers
     public class EmployeesController : Controller
     {
         private readonly EmpDbContext _context;
+
+        [BindProperty]
+        public Employee EmpData { get; set; }
 
         public EmployeesController(EmpDbContext context)
         {
@@ -56,13 +60,32 @@ namespace RazorPageUploadImgTest.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name,ImageData")] Employee employee)
         {
+            byte[] bytes = null;
+
+            if (EmpData.ImageFile !=null)
+            {
+                using (Stream fs = EmpData.ImageFile.OpenReadStream()) 
+                {
+                    using (BinaryReader br = new BinaryReader(fs))
+                    {
+                        bytes = br.ReadBytes((Int32)fs.Length);
+                    }                        
+                }
+                EmpData.ImageData = Convert.ToBase64String(bytes, 0, bytes.Length);
+            }
+
+            _context.Employees.Add(EmpData);
+            _context.SaveChanges();
+            return RedirectToAction(nameof(Index));
+
+            /*
             if (ModelState.IsValid)
             {
                 _context.Add(employee);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(employee);
+            return View(employee);*/
         }
 
         // GET: Employees/Edit/5
