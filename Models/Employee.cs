@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Http;
+
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RazorPageUploadImgTest.Models
@@ -11,7 +13,6 @@ namespace RazorPageUploadImgTest.Models
         public string ImageData { get; set; }
 
         [NotMapped]
-
-
+        public IFormFile ImageFile { get; set; }
     }
 }
